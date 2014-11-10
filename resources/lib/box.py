@@ -214,7 +214,10 @@ class box(cloudservice):
 #GET https://app.box.com/index.php?rm=box_content_workflow_get_winning_retention_for_folder&folderId=1206422275 HTTP/1.1
 #GET https://app.box.com/files
 
-        url = 'https://app.box.com/files'
+        if folderName=='':
+            url = 'https://app.box.com/files'
+        else:
+            url = 'https://app.box.com/index.php?rm=box_item_list&q[id]=d_'+folderName+'&q[page_num]=0&q[page_size]=20&q[theme_id]=1&q[collection_id]=0'
 
         opener.addheaders = [('User-Agent', self.user_agent),('Cookie', 'z='+zValue+';')]
         request = urllib2.Request(url)
@@ -230,25 +233,25 @@ class box(cloudservice):
 
         response_data = response.read()
         response.close()
+        response_data = re.sub('\\\\', '', response_data)
 
+#        requestTokenValue=''
+#        for r in re.finditer('(request_token) \= \'([^\']+)\'' ,response_data, re.DOTALL):
+#            requestTokenName,requestTokenValue = r.groups()
 
-        requestTokenValue=''
-        for r in re.finditer('(request_token) \= \'([^\']+)\'' ,response_data, re.DOTALL):
-            requestTokenName,requestTokenValue = r.groups()
+#        subIDValue=''
+#        for r in re.finditer('(realtime_subscriber_id) \=\'([^\']+)\'' ,response_data, re.DOTALL):
+#            subIDName,subIDValue = r.groups()
 
-        subIDValue=''
-        for r in re.finditer('(realtime_subscriber_id) \=\'([^\']+)\'' ,response_data, re.DOTALL):
-            subIDName,subIDValue = r.groups()
+#        if (requestTokenValue == ''):
+#            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'requestTokenValue')
+#            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'requestTokenValue', xbmc.LOGERROR)
+#            return
 
-        if (requestTokenValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'requestTokenValue')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'requestTokenValue', xbmc.LOGERROR)
-            return
-
-        if (subIDValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'subIDValue')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'subIDValue', xbmc.LOGERROR)
-            return
+#        if (subIDValue == ''):
+#            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'subIDValue')
+#            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'subIDValue', xbmc.LOGERROR)
+#            return
 
 
         mediaFiles = []
