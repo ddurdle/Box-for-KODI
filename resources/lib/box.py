@@ -128,8 +128,8 @@ class box(cloudservice):
 
 
         if (requestTokenValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'requestTokenValue')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'requestTokenValue', xbmc.LOGERROR)
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050),'requestTokenValue')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'requestTokenValue', xbmc.LOGERROR)
             return
 
 
@@ -157,8 +157,8 @@ class box(cloudservice):
         zValue = self.authorization.getToken('z')
 
         if (zValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'z')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'z', xbmc.LOGERROR)
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050),'z')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'z', xbmc.LOGERROR)
             return
 
         return
@@ -207,8 +207,8 @@ class box(cloudservice):
         zValue = self.authorization.getToken('z')
 
         if (zValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+'z')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+'z', xbmc.LOGERROR)
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050),+'z')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+'z', xbmc.LOGERROR)
             return
 
 #GET https://app.box.com/index.php?rm=box_content_workflow_get_winning_retention_for_folder&folderId=1206422275 HTTP/1.1
@@ -241,13 +241,13 @@ class box(cloudservice):
             subIDName,subIDValue = r.groups()
 
         if (requestTokenValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'requestTokenValue')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'requestTokenValue', xbmc.LOGERROR)
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'requestTokenValue')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'requestTokenValue', xbmc.LOGERROR)
             return
 
         if (subIDValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'subIDValue')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'subIDValue', xbmc.LOGERROR)
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'subIDValue')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'subIDValue', xbmc.LOGERROR)
             return
 
 
@@ -289,72 +289,76 @@ class box(cloudservice):
     ##
     def getPlaybackCall(self, playbackType, package):
 
-                downloadURL = package.getMediaURL()
-                opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookiejar))
-                opener.addheaders = [('User-Agent', self.user_agent)]
-                downloadURL = re.sub(' ', '+', downloadURL)
-                request = urllib2.Request(downloadURL)
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookiejar), MyHTTPErrorProcessor)
+        opener.addheaders = [('User-Agent', self.user_agent)]
+
+        zValue = self.authorization.getToken('z')
+
+        if (zValue == ''):
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050),'z')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+'z', xbmc.LOGERROR)
+            return
+
+        url = 'https://app.box.com/files'
+
+        opener.addheaders = [('User-Agent', self.user_agent),('Cookie', 'z='+zValue+';')]
+        request = urllib2.Request(url)
+
+        # if action fails, validate login
+
+        try:
+            response = opener.open(request)
+
+        except urllib2.URLError, e:
+                xbmc.log(self.addon.getAddonInfo('name') + ': ' + str(e), xbmc.LOGERROR)
+                return
+
+        response_data = response.read()
+        response.close()
+
+
+        requestTokenValue=''
+        for r in re.finditer('(request_token) \= \'([^\']+)\'' ,response_data, re.DOTALL):
+            requestTokenName,requestTokenValue = r.groups()
+
+        subIDValue=''
+        for r in re.finditer('(realtime_subscriber_id) \=\'([^\']+)\'' ,response_data, re.DOTALL):
+            subIDName,subIDValue = r.groups()
+
+        if (requestTokenValue == ''):
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'requestTokenValue')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'requestTokenValue', xbmc.LOGERROR)
+            return
+
+        if (subIDValue == ''):
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'subIDValue')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'subIDValue', xbmc.LOGERROR)
+            return
+
+        url = 'https://app.box.com/index.php?rm=box_download_file_via_post'
+
+
+        request = urllib2.Request(url)
 
                 # if action fails, validate login
 
-                try:
-                    response2 = opener.open(request)
+        try:
+            response = opener.open(request,'file_id='+package.file.id+'&request_token='+requestTokenValue)
 
-                except urllib2.URLError, e:
-                        xbmc.log(self.addon.getAddonInfo('name') + ': ' + str(e), xbmc.LOGERROR)
-                        return
+        except urllib2.URLError, e:
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + str(e), xbmc.LOGERROR)
+            return
 
-                response2_data = response2.read()
-                response2.close()
+        downloadURL=''
+        downloadURL = response.info().getheader('Location')
+        response.close()
 
-                formSubmission = {}
-                for t in re.finditer('id\=\"([^\"]+)\" value\=\"([^\"]+)\"' ,response2_data, re.DOTALL):
-                    formItemName,formItemValue = t.groups()
-                    formSubmission[formItemName] = formItemValue
+        if (downloadURL == ''):
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'downloadURL')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050)+ 'downloadURL', xbmc.LOGERROR)
+            return
 
-                submitURL=''
-                for t in re.finditer('id\=\"(fmHF)\" action\=\"([^\"]+)\"' ,response2_data, re.DOTALL):
-                    submitName,submitURL = t.groups()
-
-                if (submitURL == ''):
-                    xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'submitURL')
-                    xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'submitURL', xbmc.LOGERROR)
-                    return
-
-
-                MSPOK = self.authorization.getToken('MSPOK')
-                opener.addheaders = [('User-Agent', self.user_agent), ('Cookie', 'MSPOK='+MSPOK + ';')]
-
-
-                if (MSPOK == ''):
-                    xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'MSPOK')
-                    xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'MSPOK', xbmc.LOGERROR)
-                    return
-
-                try:
-
-                    response2 = opener.open(submitURL,urllib.urlencode(formSubmission))
-
-                except urllib2.URLError, e:
-                        xbmc.log(self.addon.getAddonInfo('name') + ': ' + str(e), xbmc.LOGERROR)
-                        return
-
-                response2_data = response2.read()
-                response2.close()
-
-                cookieString = ''
-                for cookie in self.cookiejar:
-                    for r in re.finditer(' ([^\=]+)\=([^\s]+)\s',
-                        str(cookie), re.DOTALL):
-                        cookieType,cookieValue = r.groups()
-                        cookieString = cookieString + cookieType + '='+ cookieValue + ';'
-
-                if (cookieString == ''):
-                    xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'cookieString')
-                    xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'cookieString', xbmc.LOGERROR)
-                    return
-
-                return downloadURL + '|' + urllib.urlencode({ 'User-Agent' : self.user_agent, 'Cookie' : cookieString })
+        return downloadURL
 
 
     ##
@@ -380,6 +384,7 @@ class MyHTTPErrorProcessor(urllib2.HTTPErrorProcessor):
 
         # only add this line to stop 302 redirection.
         if code == 302: return response
+        if code == 303: return response
 
         if not (200 <= code < 300):
             response = self.parent.error(

@@ -314,8 +314,8 @@ if mode == 'main' or mode == 'folder':
         try:
             oc
         except NameError:
-            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), addon.getLocalizedString(30049)+ 'oc')
-            log(aaddon.getLocalizedString(30049)+ 'oc', True)
+            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'oc')
+            log(aaddon.getLocalizedString(30050)+ 'oc', True)
             xbmcplugin.endOfDirectory(plugin_handle)
 
 
@@ -392,8 +392,8 @@ elif mode == 'video' or mode == 'audio':
     try:
             oc
     except NameError:
-            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), addon.getLocalizedString(30049)+ 'oc')
-            log(aaddon.getLocalizedString(30049)+ 'oc', True)
+            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'oc')
+            log(aaddon.getLocalizedString(30050)+ 'oc', True)
             xbmcplugin.endOfDirectory(plugin_handle)
 
 
@@ -402,7 +402,7 @@ elif mode == 'video' or mode == 'audio':
     url = oc.getPlaybackCall(cacheType,package.package(mediaFile,mediaFolder ))
 
     item = xbmcgui.ListItem(path=url)
-    item.setInfo( type="Video", infoLabels={ "Title": filename , "Plot" : filename } )
+    item.setInfo( type="Video", infoLabels={ "Title": title , "Plot" : title } )
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 #play a video given its exact-title
 elif mode == 'streamurl':
@@ -450,8 +450,8 @@ elif mode == 'streamurl':
     try:
             oc
     except NameError:
-            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), addon.getLocalizedString(30049)+ 'oc')
-            log(aaddon.getLocalizedString(30049)+ 'oc', True)
+            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'oc')
+            log(aaddon.getLocalizedString(30050)+ 'oc', True)
             xbmcplugin.endOfDirectory(plugin_handle)
 
 

@@ -45,7 +45,7 @@
     <string id="30046">Watch Stream</string>
     <string id="30047">Download and Watch</string>
     <string id="30048">Watch AJAX Stream</string>
-    <string id="30049">Something went wrong.  The following value was not able to initialize: </string>
-    <string id="30050">Something went wrong.  WLSCC was not set, so most likely Microsoft wants you to accept an updated set of terms and conditions.  Please log into your OneDrive account from a web browser and review any prompts.  Once you can log into your account without any prompts, retry this pluggin.</string>
+    <string id="30049">Something went wrong.</string>
+    <string id="30050">The value was not able to set:</string>
 
 </strings>
