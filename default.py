@@ -1,5 +1,5 @@
 '''
-    onedrive XBMC Plugin
+    Box XBMC Plugin
     Copyright (C) 2013-2014 ddurdle
 
     This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,7 @@ import cgi
 import re
 
 # global variables
-PLUGIN_NAME = 'onedrive'
+PLUGIN_NAME = 'box'
 
 
 
@@ -68,10 +68,7 @@ def addMediaFile(service, isQuickLink, playbackType, package):
     listitem.setProperty('fanart_image', package.file.fanart)
     cm=[]
 
-    url = package.getMediaURL()
-    cleanURL = re.sub('---', '', url)
-    cleanURL = re.sub('&', '---', cleanURL)
-    url = PLUGIN_URL+'?mode=streamurl&title='+package.file.title+'&url='+cleanURL
+    url = PLUGIN_URL+'?mode=video&title='+package.file.title+'&filename='+package.file.id
 
 
 #    cm.append(( addon.getLocalizedString(30042), 'XBMC.RunPlugin('+PLUGIN_URL+'?mode=buildstrm&title='+package.file.title+'&streamurl='+cleanURL+')', ))
@@ -147,14 +144,14 @@ PLUGIN_URL = sys.argv[0]
 plugin_handle = int(sys.argv[1])
 plugin_queries = parse_query(sys.argv[2][1:])
 
-addon = xbmcaddon.Addon(id='plugin.video.onedrive')
+addon = xbmcaddon.Addon(id='plugin.video.box')
 
 addon_dir = xbmc.translatePath( addon.getAddonInfo('path') )
 
 import os
 sys.path.append(os.path.join( addon_dir, 'resources', 'lib' ) )
 
-import onedrive
+import box
 import cloudservice
 import folder
 import file
@@ -163,7 +160,7 @@ import mediaurl
 import authorization
 
 
-#from resources.lib import onedrive
+#from resources.lib import box
 #from resources.lib import gPlayer
 #from resources.lib import tvWindow
 #from resources.lib import cloudservice
@@ -271,7 +268,7 @@ if mode == 'main' or mode == 'folder':
                         if username != '':
 
                             #let's log in
-                            oc = onedrive.onedrive(PLUGIN_URL,addon,instanceName, user_agent)
+                            oc = box.box(PLUGIN_URL,addon,instanceName, user_agent)
                             loop = False
                     except:
                         break
@@ -306,13 +303,13 @@ if mode == 'main' or mode == 'folder':
                     xbmcplugin.endOfDirectory(plugin_handle)
 
             #let's log in
-            oc = onedrive.onedrive(PLUGIN_URL,addon,instanceName, user_agent)
+            oc = box.box(PLUGIN_URL,addon,instanceName, user_agent)
 
 
         # show entries of a single account (such as folder)
         elif instanceName != '':
 
-            oc = onedrive.onedrive(PLUGIN_URL,addon,instanceName, user_agent)
+            oc = box.box(PLUGIN_URL,addon,instanceName, user_agent)
 
         try:
             oc
@@ -379,7 +376,7 @@ elif mode == 'video' or mode == 'audio':
                         if username != '':
 
                             #let's log in
-                            oc = onedrive.onedrive(PLUGIN_URL,addon,instanceName, user_agent)
+                            oc = box.box(PLUGIN_URL,addon,instanceName, user_agent)
 
                     except:
                         break
@@ -390,7 +387,7 @@ elif mode == 'video' or mode == 'audio':
 
     elif instanceName != '':
 
-            oc = onedrive.onedrive(PLUGIN_URL,addon,instanceName, user_agent)
+            oc = box.box(PLUGIN_URL,addon,instanceName, user_agent)
 
     try:
             oc
@@ -437,7 +434,7 @@ elif mode == 'streamurl':
                         if username != '':
 
                             #let's log in
-                            oc = onedrive.onedrive(PLUGIN_URL,addon,instanceName, user_agent)
+                            oc = box.box(PLUGIN_URL,addon,instanceName, user_agent)
                             loop = False
                     except:
                         break
@@ -448,7 +445,7 @@ elif mode == 'streamurl':
 
     elif instanceName != '':
 
-            oc = onedrive.onedrive(PLUGIN_URL,addon,instanceName, user_agent)
+            oc = box.box(PLUGIN_URL,addon,instanceName, user_agent)
 
     try:
             oc

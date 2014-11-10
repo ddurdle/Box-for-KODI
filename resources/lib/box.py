@@ -100,8 +100,7 @@ class box(cloudservice):
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookiejar), MyHTTPErrorProcessor)
         opener.addheaders = [('User-Agent', self.user_agent)]
 
-        url = 'https://login.live.com/login.srf?wa=wsignin1.0&rpsnv=12&checkda=1&ct=1414903461&rver=6.4.6456.0&wp=MBI_SSL_SHARED&wreply=https:%2F%2Fonedrive.live.com%2Fabout%2Fauth%2F&lc=1033&id=250206&cbcxt=sky'
-
+        url = 'https://app.box.com/login/ '
 
         request = urllib2.Request(url)
         self.cookiejar.add_cookie_header(request)
@@ -123,17 +122,15 @@ class box(cloudservice):
                 if cookieType == 'MSPRequ':
                     self.authorization.setToken(cookieType,cookieValue)
 
-        MSPRequ = self.authorization.getToken('MSPRequ')
-        opener.addheaders = [('User-Agent', self.user_agent),('Cookie', 'MSPRequ='+MSPRequ + ';')]
+        for r in re.finditer('(request_token) \= \'([^\']+)\'',
+                             response_data, re.DOTALL):
+            requestTokenName,requestTokenValue = r.groups()
 
 
-        if (MSPRequ == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'MSPRequ')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'MSPRequ', xbmc.LOGERROR)
+        if (requestTokenValue == ''):
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'requestTokenValue')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'requestTokenValue', xbmc.LOGERROR)
             return
-
-
-        url = 'https://login.live.com/login.srf?wa=wsignin1.0&rpsnv=12&ct=1414903461&rver=6.4.6456.0&wp=MBI_SSL_SHARED&wreply=https:%2F%2Fonedrive.live.com%3Fgologin%3D1%26mkt%3Den-US&lc=1033&id=250206&cbcxt=sky&mkt=en-US&ODABID=1&ODABBKT=1&username='+self.authorization.username
 
 
         request = urllib2.Request(url)
@@ -141,57 +138,7 @@ class box(cloudservice):
 
         # try login
         try:
-            response = opener.open(request)
-
-        except urllib2.URLError, e:
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + str(e), xbmc.LOGERROR)
-            return
-        response_data = response.read()
-        response.close()
-
-        PPFTValue=''
-        for r in re.finditer('name\=\"PPFT\" id\=\"([^\"]+)\" value\=\"([^\"]+)\"',
-                             response_data, re.DOTALL):
-            PPFTID,PPFTValue = r.groups()
-
-        for r in re.finditer('(uaid)\=([^\&]+)\&',
-                             response_data, re.DOTALL):
-            uaid,uaidValue = r.groups()
-        PPFTValue = re.sub('\$', '%24', PPFTValue)
-        PPFTValue = re.sub('!', '%21', PPFTValue)
-
-        if (PPFTValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'PPFTValue')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'PPFTValue', xbmc.LOGERROR)
-            return
-
-
-        for cookie in self.cookiejar:
-            for r in re.finditer(' ([^\=]+)\=([^\s]+)\s',
-                        str(cookie), re.DOTALL):
-                cookieType,cookieValue = r.groups()
-                if cookieType == 'MSPOK':
-                    self.authorization.setToken(cookieType,cookieValue)
-
-
-
-        url = 'https://login.live.com/ppsecure/post.srf?wa=wsignin1.0&rpsnv=12&ct=1414903462&rver=6.4.6456.0&wp=MBI_SSL_SHARED&wreply=https:%2F%2Fonedrive.live.com%3Fgologin%3D1%26mkt%3Den-US&lc=1033&id=250206&cbcxt=sky&mkt=en-US&ODABID=1&ODABBKT=1&username='+self.authorization.username+'&bk=1414903494&uaid='+uaidValue
-
-        request = urllib2.Request(url)
-#        self.cookiejar.add_cookie_header(request)
-
-        MSPOK = self.authorization.getToken('MSPOK')
-        opener.addheaders = [('Cookie', 'MSPOK='+MSPOK + ';')]
-
-        if (MSPOK == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'MSPOK')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'MSPOK', xbmc.LOGERROR)
-            return
-
-        # try login
-        try:
-#            response = opener.open(request,urllib.urlencode(values)+'&PPFT='+PPFTValue)
-            response = opener.open(request,'login='+self.authorization.username+'&passwd='+self.addon.getSetting(self.instanceName+'_password')+'&KMSI=1&SI=Sign+in&type=11&PPFT='+PPFTValue+'&PPSX=Pass&idsbho=1&sso=0&NewUser=1&LoginOptions=1&i1=0&i2=1&i3=52992&i4=0&i7=0&i12=1&i13=1&i14=735&i15=5115&i17=0&i18=__Login_Strings%7C1%2C__Login_Core%7C1%2C')
+            response = opener.open(request, 'login='+self.authorization.username+'&password='+self.addon.getSetting(self.instanceName+'_password')+'&request_token='+requestTokenValue)
 
         except urllib2.URLError, e:
             xbmc.log(self.addon.getAddonInfo('name') + ': ' + str(e), xbmc.LOGERROR)
@@ -204,8 +151,16 @@ class box(cloudservice):
             for r in re.finditer(' ([^\=]+)\=([^\s]+)\s',
                         str(cookie), re.DOTALL):
                 cookieType,cookieValue = r.groups()
-                if cookieType == 'WLSSC':
+                if cookieType == 'z':
                     self.authorization.setToken(cookieType,cookieValue)
+
+        zValue = self.authorization.getToken('z')
+
+        if (zValue == ''):
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'z')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'z', xbmc.LOGERROR)
+            return
+
         return
 
 
@@ -249,17 +204,19 @@ class box(cloudservice):
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookiejar))
         opener.addheaders = [('User-Agent', self.user_agent)]
 
-        WLSSC = self.authorization.getToken('WLSSC')
+        zValue = self.authorization.getToken('z')
 
-        if (WLSSC == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30050))
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30050), xbmc.LOGERROR)
+        if (zValue == ''):
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+'z')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+'z', xbmc.LOGERROR)
             return
 
+#GET https://app.box.com/index.php?rm=box_content_workflow_get_winning_retention_for_folder&folderId=1206422275 HTTP/1.1
+#GET https://app.box.com/files
 
-        url = 'https://onedrive.live.com/?gologin=1&mkt=en-US'
+        url = 'https://app.box.com/files'
 
-        opener.addheaders = [('User-Agent', self.user_agent),('Cookie', 'WLSSC='+WLSSC+';')]
+        opener.addheaders = [('User-Agent', self.user_agent),('Cookie', 'z='+zValue+';')]
         request = urllib2.Request(url)
 
         # if action fails, validate login
@@ -275,48 +232,23 @@ class box(cloudservice):
         response.close()
 
 
-        canaryValue=''
-        for r in re.finditer('\"(canary)\"\:\"([^\"]+)\"' ,response_data, re.DOTALL):
-            canaryID,canaryValue = r.groups()
+        requestTokenValue=''
+        for r in re.finditer('(request_token) \= \'([^\']+)\'' ,response_data, re.DOTALL):
+            requestTokenName,requestTokenValue = r.groups()
 
-        cidValue=''
-        for r in re.finditer('profile\.live\.com\/(cid)\-([^\/]+)\/' ,response_data, re.DOTALL):
-            cidID,cidValue = r.groups()
+        subIDValue=''
+        for r in re.finditer('(realtime_subscriber_id) \=\'([^\']+)\'' ,response_data, re.DOTALL):
+            subIDName,subIDValue = r.groups()
 
-
-
-
-        canaryValue = re.sub('\\\\u003d\d', '=1', canaryValue)
-        canaryValue = re.sub('\\\\u002b', '+', canaryValue)
-        canaryValue = re.sub('\\\\u002f', '/', canaryValue)
-
-        if (canaryValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'canaryValue')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'canaryValue', xbmc.LOGERROR)
+        if (requestTokenValue == ''):
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'requestTokenValue')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'requestTokenValue', xbmc.LOGERROR)
             return
 
-        if (cidValue == ''):
-            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'canaryValue')
-            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'canaryValue', xbmc.LOGERROR)
+        if (subIDValue == ''):
+            xbmcgui.Dialog().ok(self.addon.getLocalizedString(30000), self.addon.getLocalizedString(30049)+ 'subIDValue')
+            xbmc.log(self.addon.getAddonInfo('name') + ': ' + self.addon.getLocalizedString(30049)+ 'subIDValue', xbmc.LOGERROR)
             return
-
-        url = 'https://skyapi.onedrive.live.com/API/2/GetItems?id='+folderName+'&cid='+cidValue+'&group=0&qt=&ft=&sb=0&sd=0&gb=0%2C1%2C2&rif=0&d=1&iabch=1&caller='+cidValue+'&path=1&si=0&ps=100&pi=5&m=en-US&rset=skyweb&lct=1&v=0.8593795660417527'
-
-        opener.addheaders = [('User-Agent', self.user_agent), ('Canary', canaryValue),('AppId','1141147648'),('Accept','application/json'),('Cookie', 'WLSSC='+WLSSC+';')]
-        request = urllib2.Request(url)
-
-        # if action fails, validate login
-
-        try:
-            response = opener.open(request)
-
-        except urllib2.URLError, e:
-                xbmc.log(self.addon.getAddonInfo('name') + ': ' + str(e), xbmc.LOGERROR)
-                return
-
-        response_data = response.read()
-        response_data = re.sub("\n", '', response_data)
-        response.close()
 
 
         mediaFiles = []
@@ -335,29 +267,16 @@ class box(cloudservice):
                 media.setMediaURL(mediaurl.mediaurl(downloadURL, '','',''))
                 mediaFiles.append(media)
 
-        for r in re.finditer('\"mimeType\"\:\"video.*?\"userRole\"\:0' ,response_data, re.DOTALL):
-                entry = r.group()
-                for q in re.finditer('\"(download)\"\:\"([^\"]+)\",' ,entry, re.DOTALL):
-                    downloadID,downloadURL = q.groups()
-                for q in re.finditer('\"(name)\"\:\"([^\"]+)\",\"orderedFriendlyName\"' ,entry, re.DOTALL):
-                    titleID,title = q.groups()
+        for r in re.finditer('data\-downloadurl\=\"video\/[^\:]+\:([^\:]+)\:\/index\.php\?rm\=box_v2_download_file\&amp\;file_id\=([^\&]+)\&amp\;print_download_url\=1\"' ,response_data, re.DOTALL):
+                fileName,fileID = r.groups()
 
-                downloadURL = re.sub('\\\\', '', downloadURL)
-                downloadURL = re.sub('\%20', '+', downloadURL)
-
-                media = package.package(file.file(title, title, title, self.VIDEO, '', ''),folder.folder('',''))
-                media.setMediaURL(mediaurl.mediaurl(downloadURL, '','',''))
+                media = package.package(file.file(fileID, fileName, fileName, self.VIDEO, '', ''),folder.folder('',''))
                 mediaFiles.append(media)
 
-        for r in re.finditer('\{\"commands\"\:.*?\"userRole\"\:0\}' ,response_data, re.DOTALL):
-                entry = r.group()
-                for q in re.finditer('\"(id)\"\:\"([^\"]+)\",' ,entry, re.DOTALL):
-                    folderID,folderIDName = q.groups()
-                for q in re.finditer('\"(name)\"\:\"([^\"]+)\",\"orderedFriendlyName\"' ,entry, re.DOTALL):
-                    titleID,title = q.groups()
-                folderIDName = re.sub('!', '%21', folderIDName)
+        for r in re.finditer('data\-item_id\=\"([^\"]+)\" data\-item_type\=\"folder\" data\-behavior\=\"edit_in_place\" data\-validate\=\"filename not_empty_item_type\"\>([^\<]+)\<\/a\>' ,response_data, re.DOTALL):
+                folderID,folderName = r.groups()
 
-                media = package.package(0,folder.folder(folderIDName,title))
+                media = package.package(0,folder.folder(folderID,folderName))
                 mediaFiles.append(media)
 
 
