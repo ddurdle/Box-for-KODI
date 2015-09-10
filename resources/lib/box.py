@@ -275,6 +275,11 @@ class box(cloudservice):
 
                 media = package.package(file.file(fileID, fileName, fileName, self.VIDEO, '', ''),folder.folder('',''))
                 mediaFiles.append(media)
+        for r in re.finditer('data\-downloadurl\=\"audio\/[^\:]+\:([^\:]+)\:\/index\.php\?rm\=box_v2_download_file\&amp\;file_id\=([^\&]+)\&amp\;print_download_url\=1\"' ,response_data, re.DOTALL):
+                fileName,fileID = r.groups()
+
+                media = package.package(file.file(fileID, fileName, fileName, self.AUDIO, '', ''),folder.folder('',''))
+                mediaFiles.append(media)
 
         for r in re.finditer('data\-item_id\=\"([^\"]+)\" data\-item_type\=\"folder\" data\-behavior\=\"edit_in_place\" data\-validate\=\"filename not_empty_item_type\"\>([^\<]+)\<\/a\>' ,response_data, re.DOTALL):
                 folderID,folderName = r.groups()
