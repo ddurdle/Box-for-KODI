@@ -217,7 +217,7 @@ class box(cloudservice):
         if folderName=='':
             url = 'https://app.box.com/files'
         else:
-            url = 'https://app.box.com/index.php?rm=box_item_list&q[id]=d_'+folderName+'&q[page_num]=0&q[page_size]=20&q[theme_id]=1&q[collection_id]=0'
+            url = 'https://app.box.com/index.php?rm=box_item_list&q[id]=d_'+folderName+'&q[page_num]=0&q[page_size]=2000&q[theme_id]=1&q[collection_id]=0'
 
         opener.addheaders = [('User-Agent', self.user_agent),('Cookie', 'z='+zValue+';')]
         request = urllib2.Request(url)

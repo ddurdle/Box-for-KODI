@@ -1,3 +1,5 @@
+Version 0.1.2
+- remove page size limit on results
 Version 0.1.1
 - fixed audio playback
 - fix: I can access my account , but no music files are showing #2
