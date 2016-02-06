@@ -71,12 +71,6 @@ def addMediaFile(service, isQuickLink, playbackType, package):
     url = PLUGIN_URL+'?mode=video&title='+package.file.title+'&filename='+package.file.id
 
 
-#    cm.append(( addon.getLocalizedString(30042), 'XBMC.RunPlugin('+PLUGIN_URL+'?mode=buildstrm&title='+package.file.title+'&streamurl='+cleanURL+')', ))
-#    cm.append(( addon.getLocalizedString(30046), 'XBMC.PlayMedia('+playbackURL+'&title='+ package.file.title + '&directory='+ package.folder.id + '&filename='+ package.file.id +'&playback=0)', ))
-#    cm.append(( addon.getLocalizedString(30047), 'XBMC.PlayMedia('+playbackURL+'&title='+ package.file.title + '&directory='+ package.folder.id + '&filename='+ package.file.id +'&playback=1)', ))
-#    cm.append(( addon.getLocalizedString(30048), 'XBMC.PlayMedia('+playbackURL+'&title='+ package.file.title + '&directory='+ package.folder.id + '&filename='+ package.file.id +'&playback=2)', ))
-    #cm.append(( addon.getLocalizedString(30032), 'XBMC.RunPlugin('+PLUGIN_URL+'?mode=download&title='+package.file.title+'&filename='+package.file.id+')', ))
-
 #    listitem.addContextMenuItems( commands )
     if cm:
         listitem.addContextMenuItems(cm, False)
@@ -158,16 +152,6 @@ import file
 import package
 import mediaurl
 import authorization
-
-
-#from resources.lib import box
-#from resources.lib import gPlayer
-#from resources.lib import tvWindow
-#from resources.lib import cloudservice
-#from resources.lib import folder
-#from resources.lib import file
-#from resources.lib import package
-#from resources.lib import mediaurl
 
 
 
@@ -314,7 +298,7 @@ if mode == 'main' or mode == 'folder':
         try:
             oc
         except NameError:
-            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'oc')
+            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), addon.getLocalizedString(30049), addon.getLocalizedString(30050), 'oc')
             log(aaddon.getLocalizedString(30050)+ 'oc', True)
             xbmcplugin.endOfDirectory(plugin_handle)
 
@@ -392,7 +376,7 @@ elif mode == 'video' or mode == 'audio':
     try:
             oc
     except NameError:
-            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'oc')
+            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), addon.getLocalizedString(30049), addon.getLocalizedString(30050), 'oc')
             log(aaddon.getLocalizedString(30050)+ 'oc', True)
             xbmcplugin.endOfDirectory(plugin_handle)
 
@@ -450,7 +434,7 @@ elif mode == 'streamurl':
     try:
             oc
     except NameError:
-            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), self.addon.getLocalizedString(30049), self.addon.getLocalizedString(30050), 'oc')
+            xbmcgui.Dialog().ok(addon.getLocalizedString(30000), addon.getLocalizedString(30049), addon.getLocalizedString(30050), 'oc')
             log(aaddon.getLocalizedString(30050)+ 'oc', True)
             xbmcplugin.endOfDirectory(plugin_handle)
 
