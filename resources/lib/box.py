@@ -122,7 +122,8 @@ class box(cloudservice):
                 if cookieType == 'MSPRequ':
                     self.authorization.setToken(cookieType,cookieValue)
 
-        for r in re.finditer('(request_token) \= \'([^\']+)\'',
+#        for r in re.finditer('(request_token) \= \'([^\']+)\'',
+        for r in re.finditer('(requestToken) \= \'([^\']+)\'',
                              response_data, re.DOTALL):
             requestTokenName,requestTokenValue = r.groups()
 
