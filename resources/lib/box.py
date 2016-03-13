@@ -237,19 +237,35 @@ class box(cloudservice):
 
         mediaFiles = []
         # parsing page for files
-        for r in re.finditer('\{\"audio\"\:.*?\"userRole\"\:0\}' ,response_data, re.DOTALL):
+        for r in re.finditer('"file_\d+":{.*?]}' ,response_data, re.DOTALL):
+
+        #for r in re.finditer('\{\"audio\"\:.*?\"userRole\"\:0\}' ,response_data, re.DOTALL):
                 entry = r.group()
-                for q in re.finditer('\"(download)\"\:\"([^\"]+)\",' ,entry, re.DOTALL):
-                    downloadID,downloadURL = q.groups()
-                for q in re.finditer('\"(title)\"\:\"([^\"]+)\",' ,entry, re.DOTALL):
-                    titleID,title = q.groups()
 
-                downloadURL = re.sub('\\\\', '', downloadURL)
-                downloadURL = re.sub('\%20', '+', downloadURL)
+                for q in re.finditer('\"content_type\"\:\"([^/]+)/[^\"]+\",' ,entry, re.DOTALL):
+                    contentType= q.group(1)
+                    break
+                if contentType in ('audioa', 'videoa'):
 
-                media = package.package(file.file(title, title, title, self.AUDIO, '', ''),folder.folder('',''))
-                media.setMediaURL(mediaurl.mediaurl(downloadURL, '','',''))
-                mediaFiles.append(media)
+                    for q in re.finditer('\"name\"\:\"([^\"]+)\",' ,entry, re.DOTALL):
+                        fileName= q.group(1)
+                        break
+#                    for q in re.finditer('\"url_for_page_link\"\:\"([^\"]+)\",' ,entry, re.DOTALL):
+                    for q in re.finditer('\"url_for_page_link\"\:\"([^\"]+)\",' ,entry, re.DOTALL):
+                        downloadURL = q.group(1)
+                        #downloadURL = re.sub('\\', '', downloadURL)
+                        #downloadURL = re.sub('\%20', '+', downloadURL)
+                        break
+                    for q in re.finditer('\"id\"\:([^\,]+),' ,entry, re.DOTALL):
+                        fileID = q.group(1)
+                        break
+
+                    if contentType == 'audio':
+                        media = package.package(file.file(fileID, fileName, fileName, self.AUDIO, '', ''),folder.folder('',''))
+                    elif contentType == 'video':
+                        media = package.package(file.file('f_'+str(fileID), fileName, fileName, self.VIDEO, '', ''),folder.folder('',''))
+                    #media.setMediaURL(mediaurl.mediaurl(downloadURL, '','',''))
+                    mediaFiles.append(media)
 
         for r in re.finditer('data\-downloadurl\=\"video\/[^\:]+\:([^\:]+)\:\/index\.php\?rm\=box_v2_download_file\&amp\;file_id\=([^\&]+)\&amp\;print_download_url\=1\"' ,response_data, re.DOTALL):
                 fileName,fileID = r.groups()
@@ -262,12 +278,11 @@ class box(cloudservice):
                 media = package.package(file.file(fileID, fileName, fileName, self.AUDIO, '', ''),folder.folder('',''))
                 mediaFiles.append(media)
 
-        for r in re.finditer('data\-item_id\=\"([^\"]+)\" data\-item_type\=\"folder\" data\-behavior\=\"edit_in_place\" data\-validate\=\"filename not_empty_item_type\"\>([^\<]+)\<\/a\>' ,response_data, re.DOTALL):
+        for r in re.finditer('data-item_id=\"([^\"]+)\" data-item_type=\"folder\" data-behavior=\"edit_in_place\" data-validate=\"filename not_empty_item_type\" >([^\<]+)<\/a>' ,response_data, re.DOTALL):
                 folderID,folderName = r.groups()
 
                 media = package.package(0,folder.folder(folderID,folderName))
                 mediaFiles.append(media)
-
 
         return mediaFiles
 
